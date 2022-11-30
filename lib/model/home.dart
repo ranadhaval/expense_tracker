@@ -10,7 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:first_app/profile_ui.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
+// import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -62,22 +62,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // List<Mymodel> my_list = [];
 
+  late Stream<QuerySnapshot<Map<String, dynamic>>> datag;
   @override
   void initState() {
-
-
     super.initState();
     greetingMessage();
-
+    datag = my_data();
     // FirebaseFirestore.instance.collection("").get().then((value) {
     //   value.docs.forEach((element) {
     //     my_list.insert(
     //         0, Mymodel(hh: element.get("hh"), num: element.get("num")));
     //   });
     // });
-
-    
-
 
     // FirebaseFirestore.instance
     //     .collection("doc")
@@ -89,7 +85,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     //   });
     // });
 
-    FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+    // FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> my_data() {
+    return 
+   FirebaseFirestore.instance
+          .collection("new_users")
+          .where("email", isEqualTo: '${firebaseAuth.currentUser!.email}')
+          .snapshots()
+    
+    ;
   }
 
   edit(String id2) {
@@ -111,17 +117,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 child: Text("Edit Your Expense"),
                 onPressed: () {
                   edit(id2);
-  
 
                   // Navigator.pop(context);
-
                 },
-
               ),
               SimpleDialogOption(
                 child: Text("Delete your Expense"),
                 onPressed: () {
-                
                   FirebaseFirestore.instance
                       .collection('new_users')
                       .doc(id1)
@@ -130,8 +132,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       .delete()
                       .catchError((e) {
                     print(e);
-                
-                
                   });
 
                   Navigator.pop(context);
@@ -1190,10 +1190,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               ),
             ));
       }),
-      stream: FirebaseFirestore.instance
-          .collection("new_users")
-          .where("email", isEqualTo: '${firebaseAuth.currentUser!.email}')
-          .snapshots(),
+      stream: datag,
     );
   }
 
@@ -1595,11 +1592,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             fontWeight: FontWeight.bold, fontSize: 11),
                       ))),
                 ),
-
                 SizedBox(
                   width: 8,
                 ),
-
                 InkWell(
                   borderRadius: BorderRadius.circular(15),
                   onTap: () {
@@ -1657,7 +1652,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   ) {
     return Container(
       padding: EdgeInsets.all(5),
-      height: 100, 
+      height: 100,
       width: MediaQuery.of(context).size.width,
       child: Card(
         elevation: 5,
